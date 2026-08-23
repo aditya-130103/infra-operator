@@ -82,7 +82,7 @@ func (r *AWSCredsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 			awsCreds.Status.Phase = phaseNotFound
 
 			meta.SetStatusCondition(&awsCreds.Status.Conditions, metav1.Condition{
-				Type:    "Ready",
+				Type:    phaseReady,
 				Status:  metav1.ConditionFalse,
 				Reason:  "SecretNotFound",
 				Message: "Secret not found",
@@ -104,7 +104,7 @@ func (r *AWSCredsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		log.Info("Secret missing AWS_ACCESS_KEY_ID", "Secret name", secret.Name)
 		awsCreds.Status.Phase = phaseNotReady
 		meta.SetStatusCondition(&awsCreds.Status.Conditions, metav1.Condition{
-			Type:    "Ready",
+			Type:    phaseReady,
 			Status:  metav1.ConditionFalse,
 			Reason:  "SecretMissingField",
 			Message: "Secret missing AWS_ACCESS_KEY_ID",
@@ -121,7 +121,7 @@ func (r *AWSCredsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		log.Info("Secret missing AWS_SECRET_ACCESS_KEY", "Secret name", secret.Name)
 		awsCreds.Status.Phase = phaseNotReady
 		meta.SetStatusCondition(&awsCreds.Status.Conditions, metav1.Condition{
-			Type:    "Ready",
+			Type:    phaseReady,
 			Status:  metav1.ConditionFalse,
 			Reason:  "SecretMissingField",
 			Message: "Secret missing AWS_SECRET_ACCESS_KEY",
@@ -138,7 +138,7 @@ func (r *AWSCredsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		log.Info("Secret has empty fields", "Secret name", secret.Name)
 		awsCreds.Status.Phase = phaseNotReady
 		meta.SetStatusCondition(&awsCreds.Status.Conditions, metav1.Condition{
-			Type:    "Ready",
+			Type:    phaseReady,
 			Status:  metav1.ConditionFalse,
 			Reason:  "SecretEmptyFields",
 			Message: "Secret has empty AWS_ACCESS_KEY_ID or AWS_SECRET_ACCESS_KEY",

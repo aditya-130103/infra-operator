@@ -157,7 +157,7 @@ func (r *VPCReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 			log.Error(err, "Failed to build EC2 client for deletion")
 			vpc.Status.Phase = "Deleting"
 			meta.SetStatusCondition(&vpc.Status.Conditions, metav1.Condition{
-				Type:    "Ready",
+				Type:    phaseReady,
 				Status:  metav1.ConditionFalse,
 				Reason:  "AWSCredsNotReady",
 				Message: fmt.Sprintf("Cannot delete VPC — credentials not ready: %s", err.Error()),
@@ -178,7 +178,7 @@ func (r *VPCReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 				log.Error(err, "Failed to delete VPC in AWS", "vpcId", vpc.Status.VpcID)
 				vpc.Status.Phase = "Deleting"
 				meta.SetStatusCondition(&vpc.Status.Conditions, metav1.Condition{
-					Type:    "Ready",
+					Type:    phaseReady,
 					Status:  metav1.ConditionFalse,
 					Reason:  "DeleteFailed",
 					Message: fmt.Sprintf("AWS DeleteVpc failed: %s", err.Error()),
@@ -217,7 +217,7 @@ func (r *VPCReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 		log.Error(err, "Failed to build EC2 client")
 		vpc.Status.Phase = "Pending"
 		meta.SetStatusCondition(&vpc.Status.Conditions, metav1.Condition{
-			Type:    "Ready",
+			Type:    phaseReady,
 			Status:  metav1.ConditionFalse,
 			Reason:  "AWSCredsNotReady",
 			Message: err.Error(),
@@ -243,7 +243,7 @@ func (r *VPCReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 				vpc.Status.VpcID = ""
 				vpc.Status.Phase = "Pending"
 				meta.SetStatusCondition(&vpc.Status.Conditions, metav1.Condition{
-					Type:    "Ready",
+					Type:    phaseReady,
 					Status:  metav1.ConditionFalse,
 					Reason:  "VPCNotFound",
 					Message: "VPC not found in AWS, re-creating",
@@ -258,7 +258,7 @@ func (r *VPCReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 			log.Error(err, "Failed to describe VPC", "vpcId", vpc.Status.VpcID)
 			vpc.Status.Phase = "Failed"
 			meta.SetStatusCondition(&vpc.Status.Conditions, metav1.Condition{
-				Type:    "Ready",
+				Type:    phaseReady,
 				Status:  metav1.ConditionFalse,
 				Reason:  "DescribeFailed",
 				Message: fmt.Sprintf("AWS DescribeVpcs failed: %s", err.Error()),
@@ -274,7 +274,7 @@ func (r *VPCReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 		if awsState == "available" {
 			vpc.Status.Phase = "Available"
 			meta.SetStatusCondition(&vpc.Status.Conditions, metav1.Condition{
-				Type:    "Ready",
+				Type:    phaseReady,
 				Status:  metav1.ConditionTrue,
 				Reason:  "VPCAvailable",
 				Message: "VPC is available in AWS",
@@ -282,7 +282,7 @@ func (r *VPCReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 		} else {
 			vpc.Status.Phase = "Creating"
 			meta.SetStatusCondition(&vpc.Status.Conditions, metav1.Condition{
-				Type:    "Ready",
+				Type:    phaseReady,
 				Status:  metav1.ConditionFalse,
 				Reason:  "VPCNotReady",
 				Message: fmt.Sprintf("VPC state is %s", awsState),
@@ -311,7 +311,7 @@ func (r *VPCReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.R
 		log.Error(err, "Failed to create VPC in AWS")
 		vpc.Status.Phase = "Failed"
 		meta.SetStatusCondition(&vpc.Status.Conditions, metav1.Condition{
-			Type:    "Ready",
+			Type:    phaseReady,
 			Status:  metav1.ConditionFalse,
 			Reason:  "CreateFailed",
 			Message: err.Error(),
