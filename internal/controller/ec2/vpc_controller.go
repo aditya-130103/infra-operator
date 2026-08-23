@@ -20,6 +20,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -43,6 +44,7 @@ import (
 )
 
 const vpcFinalizer = "vpc.ec2.infra.example.com/finalizer"
+const phaseReady = "Ready"
 
 // EC2API covers the EC2 operations used by VPCReconciler, allowing tests to inject a fake.
 type EC2API interface {
@@ -79,12 +81,7 @@ type VPCReconciler struct {
 
 // helper functions - to check if a string is in a slice and to remove a string from a slice
 func containsString(slice []string, s string) bool {
-	for _, item := range slice {
-		if item == s {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, s)
 }
 
 func removeString(slice []string, s string) []string {
@@ -354,7 +351,7 @@ func (r *VPCReconciler) fetchEC2Client(ctx context.Context, vpc *ec2v1alpha1.VPC
 		return nil, err
 	}
 
-	if awsCreds.Status.Phase != "Ready" {
+	if awsCreds.Status.Phase != phaseReady {
 		return nil, fmt.Errorf("AWSCreds %s/%s is not Ready", awsCreds.Namespace, awsCreds.Name)
 	}
 

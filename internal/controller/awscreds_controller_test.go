@@ -35,6 +35,8 @@ var _ = Describe("AWSCreds Controller", func() {
 		namespace    = "default"
 		awsCredsName = "test-awscreds"
 		secretName   = "test-aws-secret"
+		keyID        = "AWS_ACCESS_KEY_ID"
+		keySecret    = "AWS_SECRET_ACCESS_KEY"
 	)
 
 	ctx := context.Background()
@@ -108,7 +110,7 @@ var _ = Describe("AWSCreds Controller", func() {
 			createAWSCreds()
 			s := &corev1.Secret{
 				ObjectMeta: metav1.ObjectMeta{Name: secretName, Namespace: namespace},
-				Data:       map[string][]byte{"AWS_SECRET_ACCESS_KEY": []byte("secret")},
+				Data:       map[string][]byte{keySecret: []byte("secret")},
 			}
 			Expect(k8sClient.Create(ctx, s)).To(Succeed())
 		})
@@ -128,7 +130,7 @@ var _ = Describe("AWSCreds Controller", func() {
 			createAWSCreds()
 			s := &corev1.Secret{
 				ObjectMeta: metav1.ObjectMeta{Name: secretName, Namespace: namespace},
-				Data:       map[string][]byte{"AWS_ACCESS_KEY_ID": []byte("AKIAIOSFODNN7EXAMPLE")},
+				Data:       map[string][]byte{keyID: []byte("AKIAIOSFODNN7EXAMPLE")},
 			}
 			Expect(k8sClient.Create(ctx, s)).To(Succeed())
 		})
@@ -149,8 +151,8 @@ var _ = Describe("AWSCreds Controller", func() {
 			s := &corev1.Secret{
 				ObjectMeta: metav1.ObjectMeta{Name: secretName, Namespace: namespace},
 				Data: map[string][]byte{
-					"AWS_ACCESS_KEY_ID":     []byte(""),
-					"AWS_SECRET_ACCESS_KEY": []byte(""),
+					keyID:     []byte(""),
+					keySecret: []byte(""),
 				},
 			}
 			Expect(k8sClient.Create(ctx, s)).To(Succeed())
@@ -172,8 +174,8 @@ var _ = Describe("AWSCreds Controller", func() {
 			s := &corev1.Secret{
 				ObjectMeta: metav1.ObjectMeta{Name: secretName, Namespace: namespace},
 				Data: map[string][]byte{
-					"AWS_ACCESS_KEY_ID":     []byte("AKIAIOSFODNN7EXAMPLE"),
-					"AWS_SECRET_ACCESS_KEY": []byte("wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"),
+					keyID:     []byte("AKIAIOSFODNN7EXAMPLE"),
+					keySecret: []byte("wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"),
 				},
 			}
 			Expect(k8sClient.Create(ctx, s)).To(Succeed())

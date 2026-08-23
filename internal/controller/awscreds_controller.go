@@ -39,6 +39,12 @@ type AWSCredsReconciler struct {
 	Scheme *runtime.Scheme
 }
 
+const (
+	phaseReady    = "Ready"
+	phaseNotReady = "NotReady"
+	phaseNotFound = "NotFound"
+)
+
 // +kubebuilder:rbac:groups=core.infra.example.com,resources=awscreds,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=core.infra.example.com,resources=awscreds/status,verbs=get;update;patch
 // +kubebuilder:rbac:groups=core.infra.example.com,resources=awscreds/finalizers,verbs=update
@@ -73,7 +79,7 @@ func (r *AWSCredsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	if err := r.Get(ctx, types.NamespacedName{Namespace: awsCreds.Spec.Credentials.SecretRef.Namespace, Name: awsCreds.Spec.Credentials.SecretRef.Name}, secret); err != nil {
 		if errors.IsNotFound(err) {
 			log.Error(err, "Secret not found, returning")
-			awsCreds.Status.Phase = "NotFound"
+			awsCreds.Status.Phase = phaseNotFound
 
 			meta.SetStatusCondition(&awsCreds.Status.Conditions, metav1.Condition{
 				Type:    "Ready",
@@ -91,12 +97,12 @@ func (r *AWSCredsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, err
 	}
 
-	//step 3: Check if the secret has the aws access key id feild
+	// step 3: Check if the secret has the aws access key id feild
 	var awsAccessKeyID, awsSecretAccessKey []byte
 	var ok bool
 	if awsAccessKeyID, ok = secret.Data["AWS_ACCESS_KEY_ID"]; !ok {
 		log.Info("Secret missing AWS_ACCESS_KEY_ID", "Secret name", secret.Name)
-		awsCreds.Status.Phase = "NotReady"
+		awsCreds.Status.Phase = phaseNotReady
 		meta.SetStatusCondition(&awsCreds.Status.Conditions, metav1.Condition{
 			Type:    "Ready",
 			Status:  metav1.ConditionFalse,
@@ -110,10 +116,10 @@ func (r *AWSCredsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 		return ctrl.Result{}, nil
 	}
 
-	//step 4: Check if the secret has the aws secret access key feild
+	// step 4: Check if the secret has the aws secret access key feild
 	if awsSecretAccessKey, ok = secret.Data["AWS_SECRET_ACCESS_KEY"]; !ok {
 		log.Info("Secret missing AWS_SECRET_ACCESS_KEY", "Secret name", secret.Name)
-		awsCreds.Status.Phase = "NotReady"
+		awsCreds.Status.Phase = phaseNotReady
 		meta.SetStatusCondition(&awsCreds.Status.Conditions, metav1.Condition{
 			Type:    "Ready",
 			Status:  metav1.ConditionFalse,
@@ -130,7 +136,7 @@ func (r *AWSCredsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	// step 5: Make sure that both the feilds are not empty
 	if len(awsAccessKeyID) == 0 || len(awsSecretAccessKey) == 0 {
 		log.Info("Secret has empty fields", "Secret name", secret.Name)
-		awsCreds.Status.Phase = "NotReady"
+		awsCreds.Status.Phase = phaseNotReady
 		meta.SetStatusCondition(&awsCreds.Status.Conditions, metav1.Condition{
 			Type:    "Ready",
 			Status:  metav1.ConditionFalse,
@@ -145,7 +151,7 @@ func (r *AWSCredsReconciler) Reconcile(ctx context.Context, req ctrl.Request) (c
 	}
 
 	// step 6: Update the status of the AWSCreds
-	awsCreds.Status.Phase = "Ready"
+	awsCreds.Status.Phase = phaseReady
 	meta.SetStatusCondition(&awsCreds.Status.Conditions, metav1.Condition{
 		Type:    "Ready",
 		Status:  metav1.ConditionTrue,

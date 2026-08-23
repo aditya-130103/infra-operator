@@ -69,6 +69,8 @@ var _ = Describe("VPC Controller", func() {
 		vpcCIDR     = "10.0.0.0/16"
 		vpcConsName = "my-test-vpc"
 		region      = "ap-south-2"
+		phaseReady  = "Ready"
+		vpcToDelete = "vpc-todelete"
 	)
 
 	ctx := context.Background()
@@ -101,7 +103,7 @@ var _ = Describe("VPC Controller", func() {
 		}
 		Expect(k8sClient.Create(ctx, ac)).To(Succeed())
 		// drive the status subresource directly — envtest respects status updates
-		ac.Status.Phase = "Ready"
+		ac.Status.Phase = phaseReady
 		Expect(k8sClient.Status().Update(ctx, ac)).To(Succeed())
 	}
 
@@ -322,7 +324,7 @@ var _ = Describe("VPC Controller", func() {
 			// set VpcID so deletion path calls DeleteVpc
 			v := &ec2v1alpha1.VPC{}
 			Expect(k8sClient.Get(ctx, namespacedName, v)).To(Succeed())
-			v.Status.VpcID = "vpc-todelete"
+			v.Status.VpcID = vpcToDelete
 			Expect(k8sClient.Status().Update(ctx, v)).To(Succeed())
 
 			// trigger deletion
@@ -404,7 +406,7 @@ var _ = Describe("VPC Controller", func() {
 
 			v := &ec2v1alpha1.VPC{}
 			Expect(k8sClient.Get(ctx, namespacedName, v)).To(Succeed())
-			v.Status.VpcID = "vpc-todelete"
+			v.Status.VpcID = vpcToDelete
 			Expect(k8sClient.Status().Update(ctx, v)).To(Succeed())
 
 			Expect(k8sClient.Delete(ctx, v)).To(Succeed())
@@ -432,7 +434,7 @@ var _ = Describe("VPC Controller", func() {
 
 			v := &ec2v1alpha1.VPC{}
 			Expect(k8sClient.Get(ctx, namespacedName, v)).To(Succeed())
-			v.Status.VpcID = "vpc-todelete"
+			v.Status.VpcID = vpcToDelete
 			Expect(k8sClient.Status().Update(ctx, v)).To(Succeed())
 
 			Expect(k8sClient.Delete(ctx, v)).To(Succeed())
