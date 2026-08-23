@@ -1,0 +1,14 @@
+apiVersion: ec2.infra.example.com/v1alpha1
+kind: VPC
+metadata:
+  labels:
+    app.kubernetes.io/name: infra-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: vpc-sample
+spec:
+  name: my-infra-vpc
+  cidrBlock: 10.0.0.0/16
+  region: ap-south-2
+  awsCredsRef:
+    name: awscreds-sample
+    namespace: default

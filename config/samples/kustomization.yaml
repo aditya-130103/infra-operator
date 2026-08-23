@@ -1,0 +1,5 @@
+## Append samples of your project ##
+resources:
+- core_v1alpha1_awscreds.yaml
+- ec2_v1alpha1_vpc.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples

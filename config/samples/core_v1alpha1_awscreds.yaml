@@ -1,0 +1,12 @@
+apiVersion: core.infra.example.com/v1alpha1
+kind: AWSCreds
+metadata:
+  labels:
+    app.kubernetes.io/name: infra-operator
+    app.kubernetes.io/managed-by: kustomize
+  name: awscreds-sample
+spec:
+  credentials:
+    secretRef:
+      name: aws-creds
+      namespace: default

@@ -1,0 +1,66 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - core.infra.example.com
+  resources:
+  - awscreds
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - core.infra.example.com
+  resources:
+  - awscreds/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - core.infra.example.com
+  resources:
+  - awscreds/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - ec2.infra.example.com
+  resources:
+  - vpcs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ec2.infra.example.com
+  resources:
+  - vpcs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - ec2.infra.example.com
+  resources:
+  - vpcs/status
+  verbs:
+  - get
+  - patch
+  - update
